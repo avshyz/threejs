@@ -1,9 +1,11 @@
 import * as THREE from "three";
-import { gui, renderer, camera, controls } from "./utils.js";
+import { renderer, camera, controls } from "./utils.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+import GUI from "lil-gui";
 
-export const rgbeLoader = new RGBELoader();
-export const textureLoader = new THREE.TextureLoader();
+const gui = new GUI({ closeFolders: true });
+const rgbeLoader = new RGBELoader();
+const textureLoader = new THREE.TextureLoader();
 
 const doorColorTexture = textureLoader.load("./textures/door/color.jpg");
 const doorAlphaTexture = textureLoader.load("./textures/door/alpha.jpg");
@@ -29,7 +31,7 @@ export const scene = new THREE.Scene();
 const material = getMeshPhysicalMaterial();
 // configureTransmission(material, gui);
 // configureClearcoat(material, gui);
-// configureIrredescence(material, gui);
+configureIrredescence(material, gui);
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
 sphere.position.x = 1.5;
@@ -75,10 +77,12 @@ function configureIrredescence(material, gui) {
 	material.iridescence = 1;
 	material.iridescenceIOR = 1;
 	material.iridescenceThicknessRange = [100, 800];
-	gui.add(material, "iridescence").min(0).max(1).step(0.0001);
-	gui.add(material, "iridescenceIOR").min(1).max(2.333).step(0.0001);
-	gui.add(material.iridescenceThicknessRange, "0").min(1).max(1000).step(1);
-	gui.add(material.iridescenceThicknessRange, "1").min(1).max(1000).step(1);
+
+	const folder = gui.addFolder("Iridescence");
+	folder.add(material, "iridescence").min(0).max(1).step(0.0001);
+	folder.add(material, "iridescenceIOR").min(1).max(2.333).step(0.0001);
+	folder.add(material.iridescenceThicknessRange, "0").min(1).max(1000).step(1);
+	folder.add(material.iridescenceThicknessRange, "1").min(1).max(1000).step(1);
 }
 
 function configureTransmission(material, gui) {
@@ -86,25 +90,28 @@ function configureTransmission(material, gui) {
 	material.ior = 1.5;
 	material.thickness = 0.5;
 
-	gui.add(material, "transmission").min(0).max(1).step(0.0001);
-	gui.add(material, "ior").min(1).max(10).step(0.0001);
-	gui.add(material, "thickness").min(0).max(1).step(0.0001);
+	const folder = gui.addFolder("Transmission");
+	folder.add(material, "transmission").min(0).max(1).step(0.0001);
+	folder.add(material, "ior").min(1).max(10).step(0.0001);
+	folder.add(material, "thickness").min(0).max(1).step(0.0001);
 }
 
 function configureSheen(material, gui) {
 	material.sheen = 1;
 	material.sheenRoughness = 0.25;
 	material.sheenColor.set(1, 1, 1);
-	gui.add(material, "sheen").min(0).max(1).step(0.0001);
-	gui.add(material, "sheenRoughness").min(0).max(1).step(0.0001);
-	gui.addColor(material, "sheenColor");
+	const folder = gui.addFolder("Sheen");
+	folder.add(material, "sheen").min(0).max(1).step(0.0001);
+	folder.add(material, "sheenRoughness").min(0).max(1).step(0.0001);
+	folder.addColor(material, "sheenColor");
 }
 
 function configureClearcoat(material, gui) {
 	material.clearcoat = 1;
 	material.clearcoatRoughness = 0;
-	gui.add(material, "clearcoat").min(0).max(1).step(0.0001);
-	gui.add(material, "clearcoatRoughness").min(0).max(1).step(0.0001);
+	const folder = gui.addFolder("Clearcoat");
+	folder.add(material, "clearcoat").min(0).max(1).step(0.0001);
+	folder.add(material, "clearcoatRoughness").min(0).max(1).step(0.0001);
 }
 
 function getToonMaterial() {
@@ -131,9 +138,10 @@ function getMeshPhysicalMaterial() {
 	material.roughness = 1;
 	material.metalness = 1;
 
-	gui.add(material, "roughness", 0, 1).step(0.001);
-	gui.add(material, "metalness", 0, 1).step(0.001);
-	gui.add(material, "aoMapIntensity", 0, 1).step(0.001);
+	const folder = gui.addFolder("Physical Material");
+	folder.add(material, "roughness", 0, 1).step(0.001);
+	folder.add(material, "metalness", 0, 1).step(0.001);
+	folder.add(material, "aoMapIntensity", 0, 1).step(0.001);
 
 	return material;
 }

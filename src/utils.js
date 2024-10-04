@@ -1,8 +1,5 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import GUI from "lil-gui";
-
-export const gui = new GUI();
 
 export const sizes = {
 	width: window.innerWidth,
