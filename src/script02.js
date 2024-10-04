@@ -1,13 +1,9 @@
 import * as THREE from "three";
-import {
-	gui,
-	textureLoader,
-	renderer,
-	scene,
-	camera,
-	rgbeLoader,
-	controls,
-} from "./utils.js";
+import { gui, renderer, camera, controls } from "./utils.js";
+import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+
+export const rgbeLoader = new RGBELoader();
+export const textureLoader = new THREE.TextureLoader();
 
 const doorColorTexture = textureLoader.load("./textures/door/color.jpg");
 const doorAlphaTexture = textureLoader.load("./textures/door/alpha.jpg");
@@ -28,8 +24,12 @@ const gradientTexture = textureLoader.load("./textures/gradients/3.jpg");
 doorColorTexture.colorSpace = THREE.SRGBColorSpace;
 matcapTexture.colorSpace = THREE.SRGBColorSpace;
 
-const material = getMeshNormalMaterial();
+export const scene = new THREE.Scene();
+
+const material = getMeshPhysicalMaterial();
 // configureTransmission(material, gui);
+// configureClearcoat(material, gui);
+// configureIrredescence(material, gui);
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
 sphere.position.x = 1.5;
