@@ -4,7 +4,6 @@ import GUI from "lil-gui";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 
 const gui = new GUI();
-
 const textureLoader = new THREE.TextureLoader();
 
 const doorColorTexture = textureLoader.load("./textures/door/color.jpg");
@@ -40,76 +39,8 @@ const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 camera.position.z = 2;
 
-// const material = new THREE.MeshBasicMaterial({ map: doorColorTexture });
-// material.alphaMap = doorAlphaTexture;
-// material.transparent = true;
-// material.side = THREE.DoubleSide;
-
-// const material = new THREE.MeshNormalMaterial();
-
-// const material = new THREE.MeshMatcapMaterial();
-// material.matcap = matcapTexture;
-
-// const material = new THREE.MeshPhongMaterial();
-// material.shininess = 100;
-// material.specular = new THREE.Color(0x1188ff);
-
-// const material = new THREE.MeshToonMaterial();
-// gradientTexture.minFilter = THREE.NearestFilter;
-// gradientTexture.magFilter = THREE.NearestFilter;
-// gradientTexture.generateMipmaps = false;
-// material.gradientMap = gradientTexture;
-
-// const material = new THREE.MeshStandardMaterial();
-const material = new THREE.MeshPhysicalMaterial();
-material.map = doorColorTexture;
-material.aoMap = doorAmbientOcclusionTexture;
-material.displacementMap = doorHeightTexture;
-material.displacementScale = 0.1;
-material.side = THREE.DoubleSide;
-material.metalnessMap = doorMetalnessTexture;
-material.roughnessMap = doorRoughnessTexture;
-material.normalMap = doorNormalTexture;
-material.alphaMap = doorAlphaTexture;
-material.transparent = true;
-material.roughness = 1;
-material.metalness = 1;
-
-// clearcoat
-// material.clearcoat = 1;
-// material.clearcoatRoughness = 0;
-// gui.add(material, "clearcoat").min(0).max(1).step(0.0001);
-// gui.add(material, "clearcoatRoughness").min(0).max(1).step(0.0001);
-
-// Sheen
-// material.sheen = 1;
-// material.sheenRoughness = 0.25;
-// material.sheenColor.set(1, 1, 1);
-// gui.add(material, "sheen").min(0).max(1).step(0.0001);
-// gui.add(material, "sheenRoughness").min(0).max(1).step(0.0001);
-// gui.addColor(material, "sheenColor");
-
-// Iridescence
-// material.iridescence = 1;
-// material.iridescenceIOR = 1;
-// material.iridescenceThicknessRange = [100, 800];
-// gui.add(material, "iridescence").min(0).max(1).step(0.0001);
-// gui.add(material, "iridescenceIOR").min(1).max(2.333).step(0.0001);
-// gui.add(material.iridescenceThicknessRange, "0").min(1).max(1000).step(1);
-// gui.add(material.iridescenceThicknessRange, "1").min(1).max(1000).step(1);
-
-// Transmission
-material.transmission = 1;
-material.ior = 1.5;
-material.thickness = 0.5;
-
-gui.add(material, "transmission").min(0).max(1).step(0.0001);
-gui.add(material, "ior").min(1).max(10).step(0.0001);
-gui.add(material, "thickness").min(0).max(1).step(0.0001);
-
-gui.add(material, "roughness", 0, 1).step(0.001);
-gui.add(material, "metalness", 0, 1).step(0.001);
-gui.add(material, "aoMapIntensity", 0, 1).step(0.001);
+const material = getMeshPhysicalMaterial();
+// configureTransmission(material, gui);
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
 sphere.position.x = 1.5;
@@ -136,6 +67,7 @@ controls.enableDamping = true;
 
 const clock = new THREE.Clock();
 animate();
+
 function animate() {
 	const elapsedTime = clock.getElapsedTime();
 
@@ -160,3 +92,95 @@ window.addEventListener("resize", () => {
 	camera.aspect = sizes.width / sizes.height;
 	camera.updateProjectionMatrix();
 });
+
+function configureIrredescence(material, gui) {
+	material.iridescence = 1;
+	material.iridescenceIOR = 1;
+	material.iridescenceThicknessRange = [100, 800];
+	gui.add(material, "iridescence").min(0).max(1).step(0.0001);
+	gui.add(material, "iridescenceIOR").min(1).max(2.333).step(0.0001);
+	gui.add(material.iridescenceThicknessRange, "0").min(1).max(1000).step(1);
+	gui.add(material.iridescenceThicknessRange, "1").min(1).max(1000).step(1);
+}
+
+function configureTransmission(material, gui) {
+	material.transmission = 1;
+	material.ior = 1.5;
+	material.thickness = 0.5;
+
+	gui.add(material, "transmission").min(0).max(1).step(0.0001);
+	gui.add(material, "ior").min(1).max(10).step(0.0001);
+	gui.add(material, "thickness").min(0).max(1).step(0.0001);
+}
+
+function configureSheen(material, gui) {
+	material.sheen = 1;
+	material.sheenRoughness = 0.25;
+	material.sheenColor.set(1, 1, 1);
+	gui.add(material, "sheen").min(0).max(1).step(0.0001);
+	gui.add(material, "sheenRoughness").min(0).max(1).step(0.0001);
+	gui.addColor(material, "sheenColor");
+}
+
+function configureClearcoat(material, gui) {
+	material.clearcoat = 1;
+	material.clearcoatRoughness = 0;
+	gui.add(material, "clearcoat").min(0).max(1).step(0.0001);
+	gui.add(material, "clearcoatRoughness").min(0).max(1).step(0.0001);
+}
+
+function getToonMaterial() {
+	const material = new THREE.MeshToonMaterial();
+	gradientTexture.minFilter = THREE.NearestFilter;
+	gradientTexture.magFilter = THREE.NearestFilter;
+	gradientTexture.generateMipmaps = false;
+	material.gradientMap = gradientTexture;
+	return material;
+}
+
+function getMeshPhysicalMaterial() {
+	const material = new THREE.MeshPhysicalMaterial();
+	material.map = doorColorTexture;
+	material.aoMap = doorAmbientOcclusionTexture;
+	material.displacementMap = doorHeightTexture;
+	material.displacementScale = 0.1;
+	material.side = THREE.DoubleSide;
+	material.metalnessMap = doorMetalnessTexture;
+	material.roughnessMap = doorRoughnessTexture;
+	material.normalMap = doorNormalTexture;
+	material.alphaMap = doorAlphaTexture;
+	material.transparent = true;
+	material.roughness = 1;
+	material.metalness = 1;
+
+	gui.add(material, "roughness", 0, 1).step(0.001);
+	gui.add(material, "metalness", 0, 1).step(0.001);
+	gui.add(material, "aoMapIntensity", 0, 1).step(0.001);
+
+	return material;
+}
+
+function getMeshPhongMaterial() {
+	const material = new THREE.MeshPhongMaterial();
+	material.shininess = 100;
+	material.specular = new THREE.Color(0x1188ff);
+	return material;
+}
+
+function getMeshMatcapMaterial() {
+	const material = new THREE.MeshMatcapMaterial();
+	material.matcap = matcapTexture;
+	return material;
+}
+
+function getMeshNormalMaterial() {
+	return new THREE.MeshNormalMaterial();
+}
+
+function getMeshStandardMaterial() {
+	const material = new THREE.MeshBasicMaterial({ map: doorColorTexture });
+	material.alphaMap = doorAlphaTexture;
+	material.transparent = true;
+	material.side = THREE.DoubleSide;
+	return material;
+}
