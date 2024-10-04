@@ -1,10 +1,13 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import GUI from "lil-gui";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
-
-const gui = new GUI();
-const textureLoader = new THREE.TextureLoader();
+import {
+	gui,
+	textureLoader,
+	renderer,
+	scene,
+	camera,
+	rgbeLoader,
+	controls,
+} from "./utils.js";
 
 const doorColorTexture = textureLoader.load("./textures/door/color.jpg");
 const doorAlphaTexture = textureLoader.load("./textures/door/alpha.jpg");
@@ -25,21 +28,7 @@ const gradientTexture = textureLoader.load("./textures/gradients/3.jpg");
 doorColorTexture.colorSpace = THREE.SRGBColorSpace;
 matcapTexture.colorSpace = THREE.SRGBColorSpace;
 
-const sizes = {
-	width: window.innerWidth,
-	height: window.innerHeight,
-};
-
-const canvas = document.querySelector("canvas.webgl");
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-const scene = new THREE.Scene();
-
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
-camera.position.z = 2;
-
-const material = getMeshPhysicalMaterial();
+const material = getMeshNormalMaterial();
 // configureTransmission(material, gui);
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
@@ -53,7 +42,6 @@ thorus.position.x = -1.5;
 
 const plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 100, 100), material);
 
-const rgbeLoader = new RGBELoader();
 rgbeLoader.load("./textures/environmentMap/2k.hdr", (environmentMap) => {
 	environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 	scene.background = environmentMap;
@@ -62,8 +50,7 @@ rgbeLoader.load("./textures/environmentMap/2k.hdr", (environmentMap) => {
 
 scene.add(camera, sphere, thorus, plane);
 
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+addLights(scene);
 
 const clock = new THREE.Clock();
 animate();
@@ -83,15 +70,6 @@ function animate() {
 	renderer.render(scene, camera);
 	requestAnimationFrame(animate);
 }
-
-window.addEventListener("resize", () => {
-	sizes.width = window.innerWidth;
-	sizes.height = window.innerHeight;
-	renderer.setSize(sizes.width, sizes.height);
-	renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-	camera.aspect = sizes.width / sizes.height;
-	camera.updateProjectionMatrix();
-});
 
 function configureIrredescence(material, gui) {
 	material.iridescence = 1;
@@ -183,4 +161,15 @@ function getMeshStandardMaterial() {
 	material.transparent = true;
 	material.side = THREE.DoubleSide;
 	return material;
+}
+
+function addLights(scene) {
+	const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+	scene.add(ambientLight);
+
+	const pointLight = new THREE.PointLight(0xffffff, 30);
+	pointLight.position.x = 2;
+	pointLight.position.y = 3;
+	pointLight.position.z = 4;
+	scene.add(pointLight);
 }
