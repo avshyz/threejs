@@ -3,6 +3,12 @@ import { renderer, camera, controls } from "./utils.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import GUI from "lil-gui";
 
+const debugObject = {
+	applyClearcoat: false,
+	applyIrredescence: false,
+	applyTransmission: false,
+	applySheen: false,
+};
 const gui = new GUI({ closeFolders: true });
 const rgbeLoader = new RGBELoader();
 const textureLoader = new THREE.TextureLoader();
@@ -114,7 +120,27 @@ function configureClearcoat(material, gui) {
 	folder.add(material, "clearcoatRoughness").min(0).max(1).step(0.0001);
 }
 
-function getToonMaterial() {
+function getMeshLambertMaterial(gui) {
+	const material = new THREE.MeshLambertMaterial();
+
+	material.map = doorColorTexture;
+	material.aoMap = doorAmbientOcclusionTexture;
+	material.displacementMap = doorHeightTexture;
+	material.displacementScale = 0.01;
+	material.side = THREE.DoubleSide;
+	material.metalnessMap = doorMetalnessTexture;
+	material.roughnessMap = doorRoughnessTexture;
+	material.normalMap = doorNormalTexture;
+	material.alphaMap = doorAlphaTexture;
+	material.transparent = true;
+
+	const folder = gui.addFolder("Lambert Material");
+	folder.add(material, "aoMapIntensity", 0, 1).step(0.001);
+
+	return material;
+}
+
+function getMeshToonMaterial() {
 	const material = new THREE.MeshToonMaterial();
 	gradientTexture.minFilter = THREE.NearestFilter;
 	gradientTexture.magFilter = THREE.NearestFilter;
