@@ -1,14 +1,7 @@
 import * as THREE from "three";
-import { renderer, camera, controls } from "./utils.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
-import GUI from "lil-gui";
+import { camera, controls, renderer } from "./utils.js";
 
-const debugObject = {
-	applyClearcoat: false,
-	applyIrredescence: false,
-	applyTransmission: false,
-	applySheen: false,
-};
 const gui = new GUI({ closeFolders: true });
 const rgbeLoader = new RGBELoader();
 const textureLoader = new THREE.TextureLoader();
@@ -35,9 +28,9 @@ matcapTexture.colorSpace = THREE.SRGBColorSpace;
 export const scene = new THREE.Scene();
 
 const material = getMeshPhysicalMaterial();
-// configureTransmission(material, gui);
+configureTransmission(material, gui);
 // configureClearcoat(material, gui);
-configureIrredescence(material, gui);
+// configureIrredescence(material, gui);
 
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 64, 64), material);
 sphere.position.x = 1.5;
