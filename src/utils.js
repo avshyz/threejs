@@ -28,3 +28,23 @@ window.addEventListener("resize", () => {
 	camera.aspect = sizes.width / sizes.height;
 	camera.updateProjectionMatrix();
 });
+
+export function initFullScreen() {
+	window.addEventListener("dblclick", () => {
+		const fullScreenElement =
+			document.fullscreenElement ||
+			document.mozFullScreenElement ||
+			document.webkitFullscreenElement;
+
+		const requestFullScreen =
+			canvas.requestFullscreen ||
+			canvas.mozRequestFullScreen ||
+			canvas.webkitRequestFullscreen;
+
+		if (!fullScreenElement) {
+			requestFullScreen.call(canvas);
+		} else {
+			document.exitFullscreen?.();
+		}
+	});
+}
