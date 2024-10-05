@@ -14,7 +14,7 @@ const textMaterial = new THREE.MeshMatcapMaterial({ matcap: greenTexture });
 
 fontLoader.load("/fonts/helvetiker_regular.typeface.json", (font) => {
 	const textGeometry = new TextGeometry(
-		"Marie, is amazing, \nthe best woman on earth!",
+		"Marie, is amazing, \nthe best woman on earth!!!",
 		{
 			font,
 			size: 0.5,
