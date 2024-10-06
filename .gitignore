@@ -71,3 +71,4 @@ node_modules/
 # TypeScript cache
 *.tsbuildinfo
 .vercel
+.idea
