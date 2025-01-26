@@ -3,6 +3,8 @@ import GUI from "lil-gui";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
+// important - when physics is too "heavy", offload to worker
+
 const sound = new Audio("/sounds/hit.mp3");
 function playHitSound(collision) {
 	const impact = collision.contact.getImpactVelocityAlongNormal();
@@ -46,10 +48,9 @@ const debugObj = {
 };
 
 const gui = new GUI();
-gui
-	.add(debugObj, "createSphere")
-	.add(debugObj, "createBox")
-	.add(debugObj, "reset");
+gui.add(debugObj, "createSphere");
+gui.add(debugObj, "createBox");
+gui.add(debugObj, "reset");
 
 /**
  * Base
